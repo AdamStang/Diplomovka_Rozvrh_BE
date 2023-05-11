@@ -48,7 +48,7 @@ namespace backend.Handlers.RoomDomain
         {
             var queryString = new SparqlParameterizedString();
 
-            queryString.CommandText = "DELETE { GRAPH ?g { @id ?p1 ?o. ?s ?p2 @id. ?s @timeslot_prop ?t. } } WHERE { Graph ?g { @id ?p1 ?o. OPTIONAL { ?s ?p2 @id. } OPTIONAL { ?s @timeslot_prop ?t. } } }";
+            queryString.CommandText = "DELETE { GRAPH ?g { @id ?p1 ?o. ?s ?p2 @id. ?s @timeslot_prop ?t. } } WHERE { Graph ?g { { @id ?p1 ?o. } UNION { ?s ?p2 @id. OPTIONAL { ?s @timeslot_prop ?t. } } } }";
             queryString.SetUri("id", HelperService.CreateUri(roomId));
             queryString.SetUri("timeslot_prop", HelperService.CreateUri(LessonConstants.TIMESLOT_PROP));
 

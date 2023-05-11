@@ -38,6 +38,13 @@ namespace backend.Handlers.TeacherDomain
             INode objDegree = _repository.GetGraph().CreateLiteralNode(teacher.Degree);
             teacherTriples.Add(new Triple(subject, predicateHasDegree, objDegree));
 
+            if (teacher.Department != null)
+            {
+                INode departmentPredicate = _repository.GetGraph().GetUriNode(HelperService.CreateUri(TeacherConstants.DEPARTMENT_PROP));
+                INode objDepartment = _repository.GetGraph().CreateUriNode(HelperService.CreateUri(teacher.Department.Id));
+                teacherTriples.Add(new Triple(subject, departmentPredicate, objDepartment));
+            }
+
             await _repository.CreateAsync(teacherTriples);
         }
 
@@ -45,7 +52,7 @@ namespace backend.Handlers.TeacherDomain
         {
             var queryString = new SparqlParameterizedString();
 
-            queryString.CommandText = "DELETE { GRAPH ?g { @id ?p1 ?o. ?s ?p2 @id. ?s @timeslot_prop ?t. ?s @room_prop ?r. } } WHERE { Graph ?g { @id ?p1 ?o. OPTIONAL { ?s ?p2 @id. } OPTIONAL { ?s @timeslot_prop ?t. ?s @room_prop ?r. } } }";
+            queryString.CommandText = "DELETE { GRAPH ?g { @id ?p1 ?o. ?s ?p2 @id. ?s @timeslot_prop ?t. ?s @room_prop ?r. } } WHERE { Graph ?g { { @id ?p1 ?o. } UNION { ?s ?p2 @id. OPTIONAL { ?s @timeslot_prop ?t. ?s @room_prop ?r. } } } }";
             queryString.SetUri("id", HelperService.CreateUri(teacherId));
             queryString.SetUri("timeslot_prop", HelperService.CreateUri(LessonConstants.TIMESLOT_PROP));
             queryString.SetUri("room_prop", HelperService.CreateUri(LessonConstants.ROOM_PROP));
